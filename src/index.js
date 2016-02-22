@@ -54,8 +54,10 @@ class ReconnectableWebSocket {
     }
   };
 
-  close = () => {
-    this._socket.close()
+  close = (code, reason) => {
+    if (typeof code === 'undefined') code = 1000
+
+    if (this._socket) this._socket.close(code, reason)
   };
 
   _onmessage = (message) => {
@@ -96,9 +98,7 @@ class ReconnectableWebSocket {
   _getTimeout = () => {
     let timeout = this._options.reconnectInterval * Math.pow(this._options.reconnectDecay, this._reconnectAttempts)
     timeout = timeout > this._options.maxReconnectInterval ? this._options.maxReconnectInterval : timeout
-    timeout = getRandom(timeout / this._options.randomRatio, timeout)
-    console.log(timeout, this._options)
-    return timeout
+    return getRandom(timeout / this._options.randomRatio, timeout)
   };
 
   _syncState = () => {
