@@ -44,6 +44,7 @@ class ReconnectableWebSocket {
     socket.onmessage = this._onmessage.bind(this)
     socket.onopen = this._onopen.bind(this)
     socket.onclose = this._onclose.bind(this)
+    socket.onerror = this._onerror.bind(this)
   };
 
   send = (data) => {
@@ -87,6 +88,13 @@ class ReconnectableWebSocket {
       }, this._getTimeout())
     }
   };
+
+  _onerror = (event) => {
+    this._syncState()
+    if (this._options.debug) console.error('WebSocket: error', event)
+
+    this.onerror && this.onerror(event)
+  }
 
   _flushQueue = () => {
     while (this._messageQueue.length !== 0) {
