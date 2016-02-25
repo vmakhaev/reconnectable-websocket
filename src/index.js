@@ -28,16 +28,12 @@ class ReconnectableWebSocket {
     if (options.automaticOpen) this.open()
   }
 
-  open = (reconnectAttempt) => {
+  open = () => {
     let socket = this._socket = new WebSocket(this._url, this._protocols)
     socket.binaryType = this._options.binaryType
 
-    if (reconnectAttempt) {
-      if (this._options.maxReconnectAttempts && this._options.maxReconnectAttempts < this._reconnectAttempts) {
-        return
-      }
-    } else {
-      this._reconnectAttempts = 0
+    if (this._options.maxReconnectAttempts && this._options.maxReconnectAttempts < this._reconnectAttempts) {
+      return
     }
 
     this._syncState()
@@ -63,13 +59,13 @@ class ReconnectableWebSocket {
   };
 
   _onmessage = (message) => {
-    this._syncState()
     this.onmessage && this.onmessage(message)
   };
 
   _onopen = (event) => {
     this._syncState()
     this._flushQueue()
+    this._reconnectAttempts = 0
 
     this.onopen && this.onopen(event)
   };
@@ -84,7 +80,10 @@ class ReconnectableWebSocket {
   };
 
   _onerror = (event) => {
-    this._syncState()
+    // To avoid undetermined state, we close socket on error
+    this._socket.close()
+    this.readyState = this.CLOSED
+
     if (this._options.debug) console.error('WebSocket: error', event)
 
     this.onerror && this.onerror(event)
@@ -97,7 +96,7 @@ class ReconnectableWebSocket {
       setTimeout(() => {
         if (this.readyState === this.CLOSED) {
           this._reconnectAttempts++
-          this.open(true)
+          this.open()
         }
       }, this._getTimeout())
     }
