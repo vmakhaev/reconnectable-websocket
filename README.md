@@ -49,6 +49,11 @@ let socket = new ReconnectableWebSocket(url, null, {reconnectInterval: 3000});
 - Accepts `true` or `false`
 - Default value: `true`
 
+#### `reconnectOnError`
+- Whether or not the websocket tries to reconnect on error
+- Accepts `true` or `false`
+- Default value: `false`
+
 #### `reconnectInterval`
 - The number of milliseconds to delay before attempting to reconnect.
 - Accepts `integer`

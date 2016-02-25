@@ -1,6 +1,7 @@
 const defaultOptions = {
   debug: false,
   automaticOpen: true,
+  reconnectOnError: false,
   reconnectInterval: 1000,
   maxReconnectInterval: 30000,
   reconnectDecay: 1.5,
@@ -79,6 +80,19 @@ class ReconnectableWebSocket {
 
     this.onclose && this.onclose(event)
 
+    this._tryReconnect(event)
+  };
+
+  _onerror = (event) => {
+    this._syncState()
+    if (this._options.debug) console.error('WebSocket: error', event)
+
+    this.onerror && this.onerror(event)
+
+    if (this._options.reconnectOnError) this._tryReconnect(event)
+  };
+
+  _tryReconnect = (event) => {
     if (!event.wasClean) {
       setTimeout(() => {
         if (this.readyState === this.CLOSED) {
@@ -88,13 +102,6 @@ class ReconnectableWebSocket {
       }, this._getTimeout())
     }
   };
-
-  _onerror = (event) => {
-    this._syncState()
-    if (this._options.debug) console.error('WebSocket: error', event)
-
-    this.onerror && this.onerror(event)
-  }
 
   _flushQueue = () => {
     while (this._messageQueue.length !== 0) {
