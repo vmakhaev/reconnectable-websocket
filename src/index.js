@@ -45,7 +45,7 @@ class ReconnectableWebSocket {
   };
 
   send = (data) => {
-    if (this._socket.readyState === WebSocket.OPEN && this._messageQueue.length === 0) {
+    if (this._socket && this._socket.readyState === WebSocket.OPEN && this._messageQueue.length === 0) {
       this._socket.send(data)
     } else {
       this._messageQueue.push(data)
