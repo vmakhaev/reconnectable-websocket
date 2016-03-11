@@ -11,6 +11,12 @@ const defaultOptions = {
   binaryType: 'blob'
 }
 
+const _url = new Symbol('url')
+const _protocols = new Symbol('protocols')
+const _options = new Symbol('options')
+const _messageQueue = new Symbol('messageQueue')
+const _reconnectAttempts = new Symbol('reconnectAttempts')
+
 class ReconnectableWebSocket {
   CONNECTING = 0;
   OPEN = 1;
@@ -18,21 +24,21 @@ class ReconnectableWebSocket {
   CLOSED = 3;
 
   constructor (url, protocols = [], options = {}) {
-    this._url = url
-    this._protocols = protocols
-    this._options = Object.assign({}, defaultOptions, options)
-    this._messageQueue = []
-    this._reconnectAttempts = 0
+    this[_url] = url
+    this[_protocols] = protocols
+    this[_options] = Object.assign({}, defaultOptions, options)
+    this[_messageQueue] = []
+    this[_reconnectAttempts] = 0
     this.readyState = this.CONNECTING
 
     if (options.automaticOpen) this.open()
   }
 
   open = () => {
-    let socket = this._socket = new WebSocket(this._url, this._protocols)
-    socket.binaryType = this._options.binaryType
+    let socket = this._socket = new WebSocket(this[_url], this[_protocols])
+    socket.binaryType = this[_options].binaryType
 
-    if (this._options.maxReconnectAttempts && this._options.maxReconnectAttempts < this._reconnectAttempts) {
+    if (this[_options].maxReconnectAttempts && this[_options].maxReconnectAttempts < this[_reconnectAttempts]) {
       return
     }
 
@@ -45,10 +51,10 @@ class ReconnectableWebSocket {
   };
 
   send = (data) => {
-    if (this._socket.readyState === WebSocket.OPEN && this._messageQueue.length === 0) {
+    if (this._socket.readyState === WebSocket.OPEN && this[_messageQueue].length === 0) {
       this._socket.send(data)
     } else {
-      this._messageQueue.push(data)
+      this[_messageQueue].push(data)
     }
   };
 
@@ -65,14 +71,14 @@ class ReconnectableWebSocket {
   _onopen = (event) => {
     this._syncState()
     this._flushQueue()
-    this._reconnectAttempts = 0
+    this[_reconnectAttempts] = 0
 
     this.onopen && this.onopen(event)
   };
 
   _onclose = (event) => {
     this._syncState()
-    if (this._options.debug) console.log('WebSocket: connection is broken', event)
+    if (this[_options].debug) console.log('WebSocket: connection is broken', event)
 
     this.onclose && this.onclose(event)
 
@@ -84,18 +90,18 @@ class ReconnectableWebSocket {
     this._socket.close()
     this.readyState = this.CLOSED
 
-    if (this._options.debug) console.error('WebSocket: error', event)
+    if (this[_options].debug) console.error('WebSocket: error', event)
 
     this.onerror && this.onerror(event)
 
-    if (this._options.reconnectOnError) this._tryReconnect(event)
+    if (this[_options].reconnectOnError) this._tryReconnect(event)
   };
 
   _tryReconnect = (event) => {
     if (!event.wasClean) {
       setTimeout(() => {
         if (this.readyState === this.CLOSED) {
-          this._reconnectAttempts++
+          this[_reconnectAttempts]++
           this.open()
         }
       }, this._getTimeout())
@@ -103,16 +109,16 @@ class ReconnectableWebSocket {
   };
 
   _flushQueue = () => {
-    while (this._messageQueue.length !== 0) {
-      let data = this._messageQueue.shift()
+    while (this[_messageQueue].length !== 0) {
+      let data = this[_messageQueue].shift()
       this._send(data)
     }
   };
 
   _getTimeout = () => {
-    let timeout = this._options.reconnectInterval * Math.pow(this._options.reconnectDecay, this._reconnectAttempts)
-    timeout = timeout > this._options.maxReconnectInterval ? this._options.maxReconnectInterval : timeout
-    return getRandom(timeout / this._options.randomRatio, timeout)
+    let timeout = this[_options].reconnectInterval * Math.pow(this[_options].reconnectDecay, this[_reconnectAttempts])
+    timeout = timeout > this[_options].maxReconnectInterval ? this[_options].maxReconnectInterval : timeout
+    return getRandom(timeout / this[_options].randomRatio, timeout)
   };
 
   _syncState = () => {
