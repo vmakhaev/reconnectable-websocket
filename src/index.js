@@ -112,7 +112,7 @@ class ReconnectableWebSocket {
   _getTimeout = () => {
     let timeout = this._options.reconnectInterval * Math.pow(this._options.reconnectDecay, this._reconnectAttempts)
     timeout = timeout > this._options.maxReconnectInterval ? this._options.maxReconnectInterval : timeout
-    return getRandom(timeout / this._options.randomRatio, timeout)
+    return this._options.randomRatio ? getRandom(timeout / this._options.randomRatio, timeout) : timeout
   };
 
   _syncState = () => {

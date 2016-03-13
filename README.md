@@ -80,7 +80,7 @@ let socket = new ReconnectableWebSocket(url, null, {reconnectInterval: 3000});
 - Default: `null`
 
 #### `randomRatio`
-- Actual timeout is calculation like `randomBetween(timeout / randomRatio, timeout)`.
+- Actual timeout is calculation like `randomBetween(timeout / randomRatio, timeout)`. If null, just uses non-random timeout.
 - Accepts `integer`.
 - Default: `3`
 
