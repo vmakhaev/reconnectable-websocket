@@ -23,6 +23,7 @@ class ReconnectableWebSocket {
     this._options = Object.assign({}, defaultOptions, options)
     this._messageQueue = []
     this._reconnectAttempts = 0
+    this._isReconnecting = false
     this.readyState = this.CONNECTING
 
     if (options.automaticOpen) this.open()
@@ -68,6 +69,11 @@ class ReconnectableWebSocket {
     this._reconnectAttempts = 0
 
     this.onopen && this.onopen(event)
+
+    if (this._isReconnecting) {
+      this._isReconnecting = false
+      this.onreconnect && this.onreconnect()
+    }
   };
 
   _onclose = (event) => {
@@ -92,14 +98,13 @@ class ReconnectableWebSocket {
   };
 
   _tryReconnect = (event) => {
-    if (!event.wasClean) {
-      setTimeout(() => {
-        if (this.readyState === this.CLOSED) {
-          this._reconnectAttempts++
-          this.open()
-        }
-      }, this._getTimeout())
-    }
+    this._isReconnecting = true
+    setTimeout(() => {
+      if (this.readyState === this.CLOSED) {
+        this._reconnectAttempts++
+        this.open()
+      }
+    }, this._getTimeout())
   };
 
   _flushQueue = () => {
