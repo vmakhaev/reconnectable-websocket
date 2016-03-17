@@ -89,6 +89,10 @@ let socket = new ReconnectableWebSocket(url, null, {reconnectInterval: 3000});
 - Accepts strings `'blob'` or `'arraybuffer'`.
 - Default: `'blob'`
 
+#### `reconnectOnCleanClose`
+- Should the connection attempt to reconnect on a clean close. This is used in the case of a server initiated close event.
+- Accepts `true` or `false`
+- Default: `false`
 ---
 
 ### Methods
