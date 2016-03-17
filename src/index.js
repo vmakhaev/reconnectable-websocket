@@ -8,7 +8,8 @@ const defaultOptions = {
   timeoutInterval: 2000,
   maxReconnectAttempts: null,
   randomRatio: 3,
-  binaryType: 'blob'
+  binaryType: 'blob',
+  reconnectOnCleanClose: false
 }
 
 class ReconnectableWebSocket {
@@ -92,14 +93,15 @@ class ReconnectableWebSocket {
   };
 
   _tryReconnect = (event) => {
-    if (!event.wasClean) {
-      setTimeout(() => {
-        if (this.readyState === this.CLOSED) {
-          this._reconnectAttempts++
-          this.open()
-        }
-      }, this._getTimeout())
+    if (event.wasClean && !this._options.reconnectOnCleanClose) {
+      return
     }
+    setTimeout(() => {
+      if (this.readyState === this.CLOSED) {
+        this._reconnectAttempts++
+        this.open()
+      }
+    }, this._getTimeout())
   };
 
   _flushQueue = () => {
