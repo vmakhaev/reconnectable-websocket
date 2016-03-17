@@ -26,6 +26,14 @@ class ReconnectableWebSocket {
     this._reconnectAttempts = 0
     this.readyState = this.CONNECTING
 
+    if (typeof this._options.debug === 'function') {
+      this._debug = this._options.debug
+    } else if (this._options.debug) {
+      this._debug = console.log.bind(console)
+    } else {
+      this._debug = function () {}
+    }
+
     if (options.automaticOpen) this.open()
   }
 
@@ -73,7 +81,7 @@ class ReconnectableWebSocket {
 
   _onclose = (event) => {
     this._syncState()
-    if (this._options.debug) console.log('WebSocket: connection is broken', event)
+    this._debug('WebSocket: connection is broken', event)
 
     this.onclose && this.onclose(event)
 
@@ -85,7 +93,7 @@ class ReconnectableWebSocket {
     this._socket.close()
     this.readyState = this.CLOSED
 
-    if (this._options.debug) console.error('WebSocket: error', event)
+    this._debug('WebSocket: error', event)
 
     this.onerror && this.onerror(event)
 
