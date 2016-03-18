@@ -107,7 +107,7 @@ class ReconnectableWebSocket {
   _flushQueue = () => {
     while (this._messageQueue.length !== 0) {
       let data = this._messageQueue.shift()
-      this._send(data)
+      this._socket.send(data)
     }
   };
 
