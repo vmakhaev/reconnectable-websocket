@@ -1,6 +1,6 @@
 {
   "name": "reconnectable-websocket",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Reconnectable websocket",
   "main": "lib/index.js",
   "scripts": {
