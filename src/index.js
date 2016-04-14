@@ -91,7 +91,6 @@ class ReconnectableWebSocket {
   _onerror = (event) => {
     // To avoid undetermined state, we close socket on error
     this._socket.close()
-    this.readyState = this.CLOSED
 
     this._debug('WebSocket: error', event)
 
@@ -105,7 +104,7 @@ class ReconnectableWebSocket {
       return
     }
     setTimeout(() => {
-      if (this.readyState === this.CLOSED) {
+      if (this.readyState === this.CLOSING || this.readyState === this.CLOSED) {
         this._reconnectAttempts++
         this.open()
       }
