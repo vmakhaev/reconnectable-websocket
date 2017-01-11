@@ -3,6 +3,8 @@
 Reconnectable websocket
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
+[![NPM Version](https://img.shields.io/npm/v/reconnectable-websocket.svg)](https://npmjs.org/package/reconnectable-websocket)
+[![NPM Downloads](https://img.shields.io/npm/dm/reconnectable-websocket.svg)](https://npmjs.org/package/reconnectable-websocket)
 
 
 ## Installation
