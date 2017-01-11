@@ -34,7 +34,7 @@ class ReconnectableWebSocket {
       this._debug = function () {}
     }
 
-    if (options.automaticOpen) this.open()
+    if (this._options.automaticOpen) this.open()
   }
 
   open = () => {
@@ -93,7 +93,8 @@ class ReconnectableWebSocket {
     this._socket.close()
 
     this._debug('WebSocket: error', event)
-
+    this._syncState()
+    
     this.onerror && this.onerror(event)
 
     if (this._options.reconnectOnError) this._tryReconnect(event)
