@@ -28,7 +28,8 @@ let socket = new ReconnectableWebSocket(url, protocols, options)
 
 #### `protocols`
 - Optional string or array of protocols per the WebSocket spec.
-- [http://dev.w3.org/html5/websockets/#refsWSP
+- http://dev.w3.org/html5/websockets/#refsWSP
+- valid values are `undefined` or `[...protocols]`
 
 #### `options`
 - Options (see below)
@@ -38,7 +39,7 @@ let socket = new ReconnectableWebSocket(url, protocols, options)
 Options can either be passed as the 3rd parameter upon instantiation or set directly on the object after instantiation:
 
 ```js
-let socket = new ReconnectableWebSocket(url, null, {reconnectInterval: 3000});
+let socket = new ReconnectableWebSocket(url, undefined, {reconnectInterval: 3000});
 ```
 
 #### `debug`
