@@ -82,6 +82,11 @@ class ReconnectableWebSocket {
     if (this._socket) this._socket.close(code, reason);
   };
 
+  heartbeatFailed = () => {
+    this._syncState();
+    this._tryReconnect({ wasClean: false });
+  }
+
   _onmessage = (message) => {
     this.onmessage && this.onmessage(message);
   };
